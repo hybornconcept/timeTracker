@@ -5,7 +5,7 @@
 	import { applyAction, enhance } from '$app/forms';
 	import pb from '$lib/pocketbase';
 	import Icon from '@iconify/svelte';
-	export const data
+	// export const data
 
 	//TO EXPORT A FUNCTION
 	export let opener;
