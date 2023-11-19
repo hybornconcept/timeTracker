@@ -176,10 +176,9 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
 						use:enhance
 						class="w-full flex flex-col space-y-3 divide-y"
 						>
-						<!-- <input type="hidden" name="someObj" value={JSON.stringify(userDataIn)} /> -->
 						<input type="hidden" name="someObj" value={JSON.stringify(userDataIn)} />
-						<!-- {#if (!isWeekend() && location && time.getHours() >= 8 && time.getHours() <= 11) } -->
-						{#if location && time.getHours() >= 18 && time.getHours() <= 20}
+						{#if (!isWeekend() && location && time.getHours() >= 8 && time.getHours() <= 11) }
+						<!-- {#if location && time.getHours() >= 18 && time.getHours() <= 20} -->
 						{#if ( location !== 'Not Currently in my Station') || (location === 'Not Currently in my Station' && isValidString(excuse)) }
 					
 						<Button
@@ -188,7 +187,6 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
 							isButtonDisabled ? '' : 'transition duration-200 ease-in hover:scale-110'}`}
 					        disabled={isButtonDisabled || timeIn}  
 							>
-							<!-- on:click={getUserDetails} -->
 								{isButtonDisabled ? 'Clocked In' : 'Clock In'}
 						</Button>
 							{/if}
@@ -206,13 +204,12 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
 					class="w-full flex flex-col space-y-3 divide-y"
 					
 					>
-					<!-- <input type="hidden" name="someObj" value={JSON.stringify(userDataIn)} /> -->
 					<input type="hidden" name="someObj" value={JSON.stringify(userDataOut)} />
-					<!-- {#if (!isWeekend() && location && time.getHours() >= 8 && time.getHours() <= 11) } -->
-					<!-- {#if ( !timeIn)}
-					<P color="text-red-700 dark:text-red-500 " class="font-semibold" align="center">You cant Clock-Out because you didnt Clock-In today</P>
-					{:else} -->
-					{#if location && time.getHours() >= 21 && time.getHours() <= 23}
+					{#if (!isWeekend() && location && time.getHours() >= 14 && time.getHours() <= 19) }
+				 	{#if ( !timeIn)}
+					<p color="text-red-700 dark:text-red-500 " class="font-semibold" align="center">You cant Clock-Out because you didnt Clock-In today</p>
+					{:else}
+					<!-- {#if location && time.getHours() >= 21 && time.getHours() <= 23} -->
 					{#if ( location !== 'Not Currently in my Station') || (location === 'Not Currently in my Station' && isValidString(excuse,10)) }
 				
 					<Button
@@ -223,7 +220,7 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
 						>
 						{isButtonDisabled ? 'Clocked Out' : 'Clock Out'}
 						</Button>
-					<!-- {/if} -->
+					{/if}
 					{/if}
 					{/if}
 				
