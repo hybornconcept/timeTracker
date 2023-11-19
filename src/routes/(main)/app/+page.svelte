@@ -3,20 +3,21 @@
 	import Icon from '@iconify/svelte';
 		import Digit from '$lib/components/Digit.svelte';
 		import Lister from '$lib/components/Lister.svelte';
-		import Modal from '$lib/components/Modal.svelte';
+		import Toaster from '$lib/components/Toaster.svelte';
+		// import Modal from '$lib/components/Modal.svelte';
 		import InputArea from '$lib/components/InputArea.svelte';
 		import { splitter, getHoursWorked , getUserData, calculateDistance, isWeekend,replaceSpace, modifyObject, isValidString, convertUtcToWat} from '$lib/repo';
 		import  { LGA , facility_location} from '$lib/db';
-		import { Avatar, Button, Textarea, Select,P } from 'flowbite-svelte';
+		import { Toast, Button, Select } from 'flowbite-svelte';
 		import { onMount } from 'svelte';
 		import {enhance} from "$app/forms";
 		import type { PageData } from './$types';
+  	
 	
 	
 	export let data: PageData;
 	// const {record, user} = data;
 	const { record, user} = data;
-	console.log(record)
 
 const timeIn = record?.created ? convertUtcToWat(record?.created).split(',')[1].trim() :  ''
 let hoursworked = record?.work_duration ||  ''
@@ -29,9 +30,8 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
 	let userData={}
 	let userDataIn: object
 	let userDataOut: object
-	let showModal = false;
-	let location: string
 	
+	let location: string
 	let time = new Date();
 	let excuse : string
 	$: excuse =''
@@ -41,18 +41,23 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
     $: duration =''
 	let isButtonDisabled = false
 
-	console.log(hoursworked)
 	// function for digital clock
 	function updateTime() {
 		time = new Date();
 	}
 	setInterval(updateTime, 1000);
 	
-	// function for modal 
-	function toggleModal() {
-		showModal = !showModal;
-	}
+	//logic for Toast
+  let popup = false;
+  function trigger() {
+    popup = !popup;
+	setTimeout(function() {
+		popup = false
+    }, 4000);
+  }
 
+	
+ 
 
 	onMount(async () => {
 		const sourceObject = await getUserData();
@@ -74,6 +79,7 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
 			obj = { ...userData, userID, distance, status, location };
 
 		}
+
 		if (!timeIn ){
 			userDataIn = modifyObject(obj, '_In')
 		}
@@ -83,31 +89,30 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
 			userDataOut['work_duration'] = hoursworked
 			userDataOut['id'] = record_id
 		} 
-		toggleModal()
-      setTimeout(() => {
-        isButtonDisabled = false;
-      }, 3600);
+		
+
+		trigger()
+	   
+	//   setTimeout(function() {
+	// 	isButtonDisabled= false;
+    // }, 300000); // 5 minutes in milliseconds
 	}
 
 
 	</script>
 	
-	<Modal popupModal={showModal} >
-		<div class="flex flex-col items-center">
-		<Icon icon="uiw:information-o" class='text-4xl' />
-			<h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to delete this product?</h3>
-			<div class="flex items-center">
-		<Button color="red" class="mr-2">Yes, I'm sure</Button>
-		<Button color="alternative">No, cancel</Button>
-	</div>
-	</div>
-	</Modal>
 	
 	
-	<section class="pt-16 bg-blueGray-50">
-		<div class="w-full lg:w-4/12 px-4 mx-auto">
+	
+	
+	<Toaster popup={popup}>
+		<div class="pl-4 text-sm font-normal">{userDataIn ? 'clocked In' : 'clocked Out'} successfully</div>
+	</Toaster>
+
+	<section class="pt-8 bg-transparent my-10">
+		<div class="lg:w-5/12 px-4 mx-auto ">
 			<div
-				class="relative flex flex-col min-w-0 break-words bg-white w-full shadow-xl rounded-lg mt-16"
+				class="relative flex flex-col min-w-0 break-words bg-white w-full shadow-xl rounded-lg mt-10"
 			>
 				<div class="px-6">
 					<div class="flex flex-wrap justify-center">
@@ -167,24 +172,25 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
 						<form
 						method="POST"
 						action="?/create"
+						on:submit|preventDefault={getUserDetails}
 						use:enhance
 						class="w-full flex flex-col space-y-3 divide-y"
-						
 						>
 						<!-- <input type="hidden" name="someObj" value={JSON.stringify(userDataIn)} /> -->
 						<input type="hidden" name="someObj" value={JSON.stringify(userDataIn)} />
 						<!-- {#if (!isWeekend() && location && time.getHours() >= 8 && time.getHours() <= 11) } -->
-						{#if location && time.getHours() >= 22 && time.getHours() <= 23}
+						{#if location && time.getHours() >= 18 && time.getHours() <= 20}
 						{#if ( location !== 'Not Currently in my Station') || (location === 'Not Currently in my Station' && isValidString(excuse)) }
+					
 						<Button
-								type="submit"
-								on:click={getUserDetails}
-								class={`flex rounded-full px-12 py-4 bg-green-400 text-3xl self-center  ${
-								isButtonDisabled ? '' : 'transition duration-200 ease-in hover:scale-110'}`}
-								>
-								<!-- disabled={isButtonDisabled || timeIn} -->
-									{isButtonDisabled ? 'Clocked In' : 'Clock In'}
-								</Button>
+							type="submit"
+							class={`flex rounded-full px-12 py-4 bg-green-400 text-3xl self-center  ${
+							isButtonDisabled ? '' : 'transition duration-200 ease-in hover:scale-110'}`}
+					        disabled={isButtonDisabled || timeIn}  
+							>
+							<!-- on:click={getUserDetails} -->
+								{isButtonDisabled ? 'Clocked In' : 'Clock In'}
+						</Button>
 							{/if}
 						{/if}
 					
@@ -195,6 +201,7 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
 					<form
 					method="POST"
 					action="?/update"
+					on:submit|preventDefault={getUserDetails}
 					use:enhance
 					class="w-full flex flex-col space-y-3 divide-y"
 					
@@ -205,17 +212,16 @@ const timeOut = record?.updated ? convertUtcToWat(record?.updated).split(',')[1]
 					<!-- {#if ( !timeIn)}
 					<P color="text-red-700 dark:text-red-500 " class="font-semibold" align="center">You cant Clock-Out because you didnt Clock-In today</P>
 					{:else} -->
-					{#if location && time.getHours() >= 0 && time.getHours() <= 2}
+					{#if location && time.getHours() >= 21 && time.getHours() <= 23}
 					{#if ( location !== 'Not Currently in my Station') || (location === 'Not Currently in my Station' && isValidString(excuse,10)) }
 				
 					<Button
-								type="submit"
-								on:click={getUserDetails}
-								class={`flex rounded-full px-12 py-4 bg-red-400 text-3xl self-center   ${
-								isButtonDisabled ? '' : 'transition duration-200 ease-in hover:scale-110'}`}
-								disabled={isButtonDisabled }
-								>
-								{isButtonDisabled ? 'Clocked Out' : 'Clock Out'}
+						type="submit"
+						class={`flex rounded-full px-12 py-4 bg-red-400 text-3xl self-center   ${
+						isButtonDisabled ? '' : 'transition duration-200 ease-in hover:scale-110'}`}
+						disabled={isButtonDisabled || hoursworked } 
+						>
+						{isButtonDisabled ? 'Clocked Out' : 'Clock Out'}
 						</Button>
 					<!-- {/if} -->
 					{/if}

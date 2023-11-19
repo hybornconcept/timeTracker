@@ -12,8 +12,7 @@
   ];
   let uniqueValuesSet = new Set();
   let LGAkeys = Object.keys(LGA);
-    
-export let data: PageData;
+  export let data: PageData;
 let { reports} = data;
 // console.log(new Date(reports[0].created).toLocaleDateString())
 const cleanedData = flattenObjects(reports);
@@ -21,7 +20,7 @@ const cleanedData = flattenObjects(reports);
   // Apply ransformations to the original array
   // const transformedArray = transformArray(originalArray);
 
-const filterArray =['name', 'location_In','location_out', 'status_In', 'status_Out','time_in','time_out', 'work_duration','station']
+const filterArray =['name', 'location_In','location_Out', 'status_In', 'status_Out','time_in','time_out', 'work_duration', 'id']
 const tableData = filterArrayOfObjects(cleanedData,filterArray)
 const tableHeaders = Object.keys(tableData[0])
 
@@ -104,7 +103,7 @@ $: filteredItems = convertedData.filter((item) =>
       <TableHead class="bg-gray-100">
         {#each tableHeaders as header}
        {#if header !=='id'}
-        <TableHeadCell>{header}</TableHeadCell>
+        <TableHeadCell class="px-3">{header}</TableHeadCell>
         {/if}
       {/each}
       </TableHead>
@@ -113,18 +112,18 @@ $: filteredItems = convertedData.filter((item) =>
         <TableBodyRow>
 
               <TableBodyCell>{data.name}</TableBodyCell>
-              <TableBodyCell>{data.location_In}</TableBodyCell>
-              <TableBodyCell>{data.location_out}</TableBodyCell>
-              <TableBodyCell><Badge status= {data.status_In || 'nil'}/></TableBodyCell>
-              <TableBodyCell><Badge status= {data.status_Out || 'nil'}/></TableBodyCell>
-              <TableBodyCell>{data.time_in}</TableBodyCell>
-              <TableBodyCell>{data.time_out}</TableBodyCell>
-              <TableBodyCell>{data.work_duration}</TableBodyCell>
-              <TableBodyCell>
+              <TableBodyCell class="px-3">{data.location_In.length > 25 ? data.location_In.substring(0, 25) + "..." : data.location_In}</TableBodyCell>
+              <TableBodyCell class="px-3">{data.location_Out.length > 25 ? data.location_Out.substring(0, 25) + "..." : data.location_Out}</TableBodyCell>
+              <TableBodyCell class="px-3"><Badge status= {data.status_In || 'nil'}/></TableBodyCell>
+              <TableBodyCell class="px-3"><Badge status= {data.status_Out || 'nil'}/></TableBodyCell>
+              <TableBodyCell class="px-3">{data.time_in}</TableBodyCell>
+              <TableBodyCell class="px-3">{data.time_out}</TableBodyCell>
+              <TableBodyCell class="px-3">{data.work_duration}</TableBodyCell>
+              <TableBodyCell class="px-3">
                 <a href="/reports/{data.id}" class="font-medium text-blue-600 hover:underline dark:text-primary-500">VIEW</a>
             </TableBodyCell>
             </TableBodyRow>
-          
+            
           {/each} 
       </TableBody>
     </Table>

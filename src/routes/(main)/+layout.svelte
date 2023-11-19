@@ -4,16 +4,10 @@
 		SidebarGroup,
 		SidebarItem,
 		SidebarWrapper,
-		Avatar,
-		Dropdown,
-		DropdownHeader,
-		DropdownItem,
-		DropdownDivider,
-		Button,
+
 		Drawer,
 		CloseButton,
-		Modal,
-		A
+	
 	} from 'flowbite-svelte';
 	import { page } from '$app/stores';
 
@@ -24,7 +18,9 @@
 	import Icon from '@iconify/svelte';
 	import { navigation} from '$lib/repo';
 
+	export let data
 
+	// let data = $page.data.user;
 
 	let spanClass = 'flex-1  whitespace-nowrap';
 	let hidden = true;
@@ -36,7 +32,6 @@
 		easing: sineIn
 	};
 
-	let data = $page.data.user;
 	$: activeUrl = $page.url.pathname;
 	//TO RECIEVE A FUNCTION
 	export let opener = () => {
@@ -44,7 +39,7 @@
 	};
 </script>
 
-<section class="flex w-full bg-slate-50">
+<section class="flex w-full bg-slate-50 min-h-screen ">
 	<!-- Sidebar  -->
 	<Drawer
 		{activateClickOutside}
@@ -52,9 +47,9 @@
 		transitionType="fly"
 		{transitionParams}
 		bind:hidden
-		class="absolute inset-0 transform lg:transform-none border bg-card text-card-foreground shadow overflow-hidden lg:opacity-100 lg:relative z-10  h-screen "
+		class="absolute inset-0 transform lg:transform-none min-h-screen  border bg-card text-card-foreground shadow overflow-hidden lg:opacity-100 lg:relative z-10"
 	>
-		 <div class="flex items-center py-3  ">
+		 <div class="flex items-center py-3 overflow-x-hidden ">
 		
             <div class="flex gap-2 mb-5">
 				<div class="bg-primary-700 rounded-full p-2">
@@ -71,7 +66,7 @@
 			/>
 		</div>
 
-		<Sidebar class="pr-5">
+		<Sidebar class="pr-5 ">
 			<SidebarWrapper divClass=" py-4  rounded dark:bg-gray-800  ">
 				<SidebarGroup>
 					{#each navigation as navItem}
@@ -110,8 +105,8 @@
 		</Sidebar>
 	</Drawer>
 	<div class="flex flex-col w-full min-h-full">
-		<Header {data} {opener} />
-		<div class="container mx-auto">
+		<Header name ={data.user.name} email={data.user.email} {opener} />
+		<div class="container mx-auto ">
 			<!-- Header  -->
 			<!-- Main  -->
 			<slot />

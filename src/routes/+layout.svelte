@@ -5,8 +5,9 @@
 
 	
 </script>
+
 <slot/>
-<footer class="text-gray-600 body-font border border-black-100">
+<footer class="text-gray-600 body-font border border-black-100 ">
 	<div class="bg-slate-100">
 		<div class="container px-5 py-6 mx-auto flex items-center sm:flex-row flex-col">
 			<div class="flex gap-2">
@@ -28,7 +29,7 @@
 			</p>
 			<span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
 				{#each socials as social}
-					<a class="text-gray-500">
+					<a href="javascript:void(0)" class="text-gray-500">
 						<Icon icon={social} class="text-3xl mx-2" />
 					</a>
 				{/each}

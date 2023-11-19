@@ -180,33 +180,56 @@ export function filterArrayOfObjects(arrayOfObjects, filterArray) {
 	  return filteredObj;
 	});
   }
- export  function flattenObjects(arrayOfObjects) {
-	return arrayOfObjects.map(obj => {
-	  // Check if 'expand' property exists
-	  if (obj.expand && obj.expand.userID) {
-		// Merge properties of 'userID' into the top-level object
-		const flattenedObject = {
-		  ...obj,
-		  ...obj.expand.userID
-		};
-  
-		// Remove the 'expand' property
-		delete flattenedObject.expand;
-		const { created, updated, ...rest } = flattenedObject;
-		return {
-		  ...rest,
-		  time_in: created,
-		  time_out: updated
-		};
+	export  function flattenObjects(arrayOfObjects) {
+		const processedArray = [];
 	  
-
-	  } else {
-		// If 'expand' or 'userID' does not exist, return the original object
-		return obj;
+		for (let i = 0; i < arrayOfObjects.length; i++) {
+		  const obj = arrayOfObjects[i];
+		  const { id, expand: { userID, ...restExpand }, created, updated, ...rest } = obj;
+	  
+		  // Check if 'id' property exists in the array
+		  const existingIdIndex = processedArray.findIndex(item => item.id === id);
+	  
+		  // If 'id' property exists, delete the first occurrence
+		  if (existingIdIndex !== -1) {
+			processedArray.splice(existingIdIndex, 1);
+		  }
+	  
+		  // Create a single object by merging all sub-objects and keeping the 'id' property
+		  const mergedObject = {
+			...rest,
+			...userID,
+			...restExpand,
+			id,
+			time_in: created,
+			time_out: updated,
+		  };
+	  
+		  processedArray.push(mergedObject);
+		}
+	  
+		return processedArray;
 	  }
-	});
+  
+export function getTimeAgo(dateString) {
+	const givenDate = new Date(dateString);
+	const currentDate = new Date();
+  
+	const differenceInMilliseconds = currentDate - givenDate;
+	const differenceInDays = Math.floor(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+  
+	if (differenceInDays < 7) {
+	  return `${differenceInDays} ${differenceInDays === 1 ? 'day' : 'days'} ago`;
+	} else if (differenceInDays < 30) {
+	  const weeks = Math.floor(differenceInDays / 7);
+	  return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+	} else {
+	  const months = Math.floor(differenceInDays / 30);
+	  return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+	}
   }
 
+  
  export function transformObject(obj) {
 	const newObj = {};
 	for (const key in obj) {
@@ -227,15 +250,33 @@ export function filterArrayOfObjects(arrayOfObjects, filterArray) {
 	return array.map(transformObject);
   }
   
-
+  export function flattenUserDetails(obj) {
+	const {
+	  expand: { userID: { created: expandCreated, updated: expandUpdated, ...expandRest } },
+	  ...restDetails
+	} = obj;
+  
+	const flattenedDetails = { expandCreated, expandUpdated, ...expandRest, ...restDetails };
+  
+	return flattenedDetails;
+  }
 
   // partition reort data to display on info page
- export  function filterObjectBySubstring(obj, substring1, substring2) {
+  export function filterObjectBySubstring(keysToKeep, yourObject, substring1, substring2) {
+  
 	const obj1 = {};
 	const obj2 = {};
 	const obj3 = {};
-  
-	Object.entries(obj).forEach(([key, value]) => {
+	const filteredObj = {};
+	
+	const { created,updated, ...rest } = yourObject;
+	const renamedObject = {
+		time_In: convertUtcToWat(created).split(',')[1], 
+		time_Out: convertUtcToWat(updated) === convertUtcToWat(created) ? '' :convertUtcToWat(updated).split(',')[1] , 
+		...rest
+	};
+
+	Object.entries(renamedObject).forEach(([key, value]) => {
 	  if (key.includes(substring1)) {
 		obj1[key] = value;
 	  } else if (key.includes(substring2)) {
@@ -244,10 +285,35 @@ export function filterArrayOfObjects(arrayOfObjects, filterArray) {
 		obj3[key] = value;
 	  }
 	});
-  
-	return [obj1, obj2, obj3];
+	keysToKeep.forEach(key => {
+		if (obj3.hasOwnProperty(key)) {
+		  filteredObj[key] = obj3[key];
+		}
+	  });
+	
+	return [obj1, obj2, filteredObj];
   }
-  
+	export function removeSuffixFromKeys(obj, suffix ='') {
+		const modifiedObject = {};
+	  
+		Object.keys(obj).forEach(key => {
+		  // Remove the specified suffix from each key
+		  const modifiedKey = key.replace(new RegExp(`${suffix}$`), '')
+		  .replace(/_/g, ' ')
+		  .replace(/\b\w/g, match => match.toUpperCase());
+	  
+		  // Capitalize the first letter of the modified key
+		  const capitalizedKey = modifiedKey.charAt(0).toUpperCase() + modifiedKey.slice(1);
+	  
+		  // Assign the value to the modified key in the new object
+		  modifiedObject[capitalizedKey] = obj[key];
+		});
+	  
+		return modifiedObject;
+	  }
+
+
+
 // remove empty space fromdata from database 
 export function replaceSpace(str) {
     return str.replace(/\s/g, "_");
@@ -262,3 +328,21 @@ export function replaceSpace(str) {
 // timeWorked?: string;
 
 // }
+let showModal = false;
+// <!-- <Modal popupModal={showModal} >
+// 		<div class="flex flex-col items-center">
+// 		<Icon icon="uiw:information-o" class='text-4xl' />
+// 			<h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to delete this product?</h3>
+// 			<div class="flex items-center">
+// 		<Button color="red" class="mr-2">Yes, I'm sure</Button>
+// 		<Button color="alternative">No, cancel</Button>
+// 	</div>
+// 	</div>
+// 	</Modal> -->
+
+// // function for modal 
+// function toggleModal() {
+// 	showModal = !showModal;
+// }
+
+// toggleModal()

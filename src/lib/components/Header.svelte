@@ -1,11 +1,9 @@
 <script lang="ts">
-	import { Avatar, Dropdown, DropdownHeader, DropdownItem, Button } from 'flowbite-svelte';
-	import { page } from '$app/stores';
-	import type { PageData } from './$types';
-	import { applyAction, enhance } from '$app/forms';
-	import pb from '$lib/pocketbase';
+	import { Avatar, Dropdown, DropdownItem } from 'flowbite-svelte';
+
 	import Icon from '@iconify/svelte';
-	// export const data
+	export let name
+	export let email
 
 	//TO EXPORT A FUNCTION
 	export let opener;
@@ -39,33 +37,29 @@
 	<div>
 		<!-- <h1 class="font-poppins text-lg md:text-3xl">EID Tracker (Pre-Natal Data Collection)</h1> -->
 	</div>
-	<div class="text-3xl flex gap-x-3 items-center">
+	<div class="text-3xl flex items-center divide-x-2 space-x-3 pr-6 divide-primary-200 " >
 		<Icon icon="clarity:notification-line" />
-		<!-- {#if data} -->
-			<div class="border-l-2 px-2">
-				<Button pill color="light" id="avatar_with_name" size="sm" class="p-2">
-					<Avatar
-						src="https://i.pravatar.cc/300"
-						id="avatar-menu"
-						border
-						class="ring-teal-400 dark:ring-teal-300 mr-2 block"
-						>{$page.data.user.email.charAt(0).toUpperCase()}
-					</Avatar>
-
+			<div id="avatar_with_name" class="p-2 cursor-pointer">
+						
+				<Avatar 
+					class="ring-primary-700 dark:ring-primary-300 ml-2  block text-xl border-primary-700 border-2"
+					
+					>
+					{name.split(' ').map(word => word.charAt(0)).join('').slice(-2)}
+				</Avatar>
+	
 					<!-- <span class="hidden md:block">{data.email}</span> -->
-				</Button>
+				</div>
 				<Dropdown triggeredBy="#avatar_with_name">
 					<div slot="header" class="px-4 py-2">
-						<span class="block text-sm text-gray-900 dark:text-white">Bonnie Green</span>
-						<span class="block truncate text-sm font-medium">name@flowbite.com</span>
+						<span class="block text-sm text-gray-900 dark:text-white">{name}</span>
+						<span class="block truncate text-sm font-medium">{email}</span>
 					</div>
+					<DropdownItem>App</DropdownItem>
 					<DropdownItem>Dashboard</DropdownItem>
-					<DropdownItem>Settings</DropdownItem>
-					<DropdownItem>Earnings</DropdownItem>
-					<DropdownItem slot="footer">Sign out</DropdownItem>
+					<DropdownItem slot="footer">Log out</DropdownItem>
 				</Dropdown>
-			</div>
-		<!-- {/if} -->
+	
 	</div>
 </header>
 

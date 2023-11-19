@@ -1,42 +1,33 @@
 <script lang="ts">
     import type { PageData } from './$types';
     import Details from '$lib/components/Details.svelte';
-    import {filterObjectBySubstring} from '$lib/repo';
+    import {filterObjectBySubstring , removeSuffixFromKeys, flattenUserDetails, getTimeAgo} from '$lib/repo';
+
+    // setContext('myObjectContext', myObject);
     export let data: PageData;
     let { userDetails} = data;
-    const [obj1, obj2, obj3] = filterObjectBySubstring(userDetails, 'In', 'Out');
+    
+   
+    // console.log(userDetails)
+    const cleanedData = flattenUserDetails(userDetails);
+    const keysToKeep = ['name', 'position', 'station','work_duration'];
+    const [obj1, obj2, obj3] = filterObjectBySubstring(keysToKeep, cleanedData, 'In', 'Out');
+
+const obj_one = removeSuffixFromKeys(obj1,'_In')
+const obj_two =  removeSuffixFromKeys(obj2,'_Out')
+const obj_three =  removeSuffixFromKeys(obj3,)
+let period = getTimeAgo(cleanedData.expandCreated.split(' ')[0])
 </script>
 
-<section class="flex p-6 max-w-6xl mx-auto space-x-5">
-    <div class="flex flex-col rounded-xl border bg-card text-card-foreground shadow p-6 mx-auto w-1/3 ">
-        <div class="flex flex-col mb-10 py-2 border-b border-1 border-slate-300">
-            <h3 class="font-semibold tracking-tight text-3xl">User Details</h3>
-            <p class="text-sm text-slate-500">Enter your email below to create your account</p>
+<section class="flex p-6 max-w-7xl mx-auto flex-col">
+        <div class="flex flex-col border-slate-300 px-8">
+            <h3 class="font-semibold tracking-tight text-3xl">Staff Log Details </h3>
+            <p class="text-sm text-slate-500">here is the log details for </p>
         </div>
-        <div class="flex flex-col  justify-between space-y-6 lg:space-y-0">
-        {#each Object.entries(obj3) as [key, value]}
-            <Details key={key} value={value} />
-          {/each}
-        </div>
-    </div>
 
-<div class="flex flex-col rounded-xl border bg-card text-card-foreground shadow p-6 mx-auto w-2/3 ">
-    <div class="flex flex-col mb-10 py-2 border-b border-1 border-slate-300">
-        <h3 class="font-semibold tracking-tight text-3xl">Activity Log</h3>
-        <p class="text-sm text-slate-500">Enter your email below to create your account</p>
-    </div>
- 
-
-    <div class="grid max-w-screen-lg  space-y-6 lg:grid-cols-2 lg:space-y-0 lg:divide-x ">
-        <div class="space-y-6 sm:px-16">
-            {#each Object.entries(obj2) as [key, value]}
-            <Details key={key} value={value} />
-            {/each}
+        <div class="grid grid-cols-3 gap-4 mx-auto ">
+            <Details myObject={obj_three} color={'bg-gray-200'} clock={'User Details'} {period}/>
+            <Details myObject={obj_one} color={'bg-teal-200'} clock={'Clock In Log'} {period}/>
+            <Details myObject={obj_two} color={'bg-rose-200'} clock={'Clock Out Log'} {period}/>
         </div>
-        <div class="space-y-6 sm:px-16">
-            {#each Object.entries(obj1) as [key, value]}
-            <Details key={key} value={value} />
-            {/each}
-    </div>
-</div>
 </section>

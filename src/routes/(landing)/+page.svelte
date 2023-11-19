@@ -4,9 +4,12 @@
 	import Icon from '@iconify/svelte';
 	import {sections} from '$lib/repo';
 
+	export let data;
+
+
 </script>
 
-<section class="flex max-w-7xl mx-auto">
+<section class="flex max-w-7xl mx-auto mt-3">
 	<Navbar>
 		<NavBrand href="/">
 			<div class="flex gap-2">
@@ -18,29 +21,32 @@
 				>
 			</div>
 		</NavBrand>
+		{#if !data.user}
+					
+			<Button href="/auth/login"color="light" class="border border-black" pill>Login</Button>
+			{:else}
 			<div id="avatar_with_name" class="p-2">
-				<Avatar
-					src="https://i.pravatar.cc/300"
-					id="avatar-menu"
-					border
-					class="ring-teal-400 dark:ring-teal-300 mr-2 block"
-					>
-					<!-- {$page.data.user.email.charAt(0).toUpperCase()} -->
-					AC
-				</Avatar>
+			
+				
+				<Avatar 
+				class="ring-primary-700 dark:ring-primary-300 mr-2 block  border-primary-700 border-2"
+				
+				>
+				{data.user.name.split(' ').map(word => word.charAt(0)).join('')}
+			</Avatar>
 
 				<!-- <span class="hidden md:block">{data.email}</span> -->
 			</div>
 			<Dropdown triggeredBy="#avatar_with_name">
 				<div slot="header" class="px-4 py-2">
-					<span class="block text-sm text-gray-900 dark:text-white">Bonnie Green</span>
-					<span class="block truncate text-sm font-medium">name@flowbite.com</span>
+					<span class="block text-sm text-gray-900 dark:text-white">{data.user.name}</span>
+					<span class="block truncate text-sm font-medium">{data.user.email}</span>
 				</div>
+				<DropdownItem>App</DropdownItem>
 				<DropdownItem>Dashboard</DropdownItem>
-				<DropdownItem>Settings</DropdownItem>
-				<DropdownItem>Earnings</DropdownItem>
-				<DropdownItem slot="footer">Sign out</DropdownItem>
+				<DropdownItem slot="footer">Log out</DropdownItem>
 			</Dropdown>
+			{/if}
 	</Navbar>
 </section>
 
@@ -51,7 +57,7 @@
 			<div class="mb-3">
 				<p
 					role="alert"
-					class="inline-flex items-center justify-between px-2 py-1 text-sm bg-slate-500 rounded-full text-white gap-3"
+					class="inline-flex items-center justify-between px-2 py-1 text-sm bg-black rounded-full text-white gap-3"
 				>
 					<Icon icon="clarity:beta-solid" />
 					<span class="text-sm font-medium">Beta version 0.0.1</span>
@@ -67,9 +73,16 @@
 				tilde chillwave ugh.
 			</p>
 			<div class="flex justify-center">
-				<Button color="primary" class="px-12 py-4 hover:bg-slate-800 text-xl"
-				href="/app"
-				 pill>Launch</Button>
+		
+				 <Button color="dark" pill href="/app" class="relative px-12 py-4 text-md overflow-hidden font-medium text-gray-600 bg-white-100 border border-black   group">
+					<span class="absolute top-0 left-0 w-0 h-0 transition-all duration-200 border-t-2 border-gray-600 group-hover:w-full ease"></span>
+					<span class="absolute bottom-0 right-0 w-0 h-0 transition-all duration-200 border-b-2 border-gray-600 group-hover:w-full ease"></span>
+					<span class="absolute top-0 left-0 w-full h-0 transition-all duration-300 delay-200 bg-gray-600 group-hover:h-full ease"></span>
+					<span class="absolute bottom-0 left-0 w-full h-0 transition-all duration-300 delay-200 bg-gray-600 group-hover:h-full ease"></span>
+					<span class="absolute inset-0 w-full h-full duration-300 delay-300 bg-gray-900 opacity-0 group-hover:opacity-100"></span>
+					<span class="relative transition-colors duration-300 delay-200 group-hover:text-white ease">Get Started</span>
+					</Button>
+
 			</div>
 		</div>
 		<div class="flex flex-wrap max-w-7xl mx-auto">
