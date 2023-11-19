@@ -8,8 +8,7 @@
   import Badge from '$lib/components/Badge.svelte';
 
   let selected;
-  let periods = [ 
-  ];
+  let periods = [ ];
   let uniqueValuesSet = new Set();
   let LGAkeys = Object.keys(LGA);
   export let data: PageData;
@@ -29,7 +28,6 @@ const convertedData = tableData.map(entry => {
   const timeInParts = entry.time_in ? convertUtcToWat(entry.time_in).split(',') :'';
   const timeOutParts = entry.time_out ? convertUtcToWat(entry.time_out).split(',') :'';
 
-
   if (timeInParts[0] && !uniqueValuesSet.has(timeInParts[0])) {
     periods.push({
     value: timeInParts[0],
@@ -40,6 +38,7 @@ const convertedData = tableData.map(entry => {
   const newData = {
     ...entry,
     time_in: timeInParts[1],
+    date: timeInParts[0],
     time_out: timeOutParts[1] === timeInParts[1] ? '' : timeOutParts[1],
 
   };
@@ -48,11 +47,25 @@ const convertedData = tableData.map(entry => {
 
 
 let searchTerm = '';
+let dropTerm = '';
 $: filteredItems = convertedData.filter((item) =>
     Object.values(item).some((value) =>
       typeof value === 'string' && value.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
+  $: filteredItems = convertedData.filter((item) =>
+    Object.values(item).some((value) =>
+      typeof value === 'string' && value.toLowerCase().includes(dropTerm.toLowerCase())
+    )
+  );
+// let obj = {
+//   searchTerm: '',
+//   dropTerm: ''
+// };
+// $: searchTerm = obj.searchTerm
+// $: dropTerm = obj.dropTerm
+
+
 
 
 
@@ -73,7 +86,7 @@ $: filteredItems = convertedData.filter((item) =>
       </div>
 		  <div class="ml-auto flex items-center space-x-4 ">
         <div class="w-64">
-          <Select  items={periods} bind:value={searchTerm} />
+          <Select  items={periods} bind:value={dropTerm} placeholder="Select Period"/>
         </div>
 		    <div>
           <div class=" w-32">
@@ -109,6 +122,7 @@ $: filteredItems = convertedData.filter((item) =>
       </TableHead>
       <TableBody class="divide-y">
         {#each filteredItems as data} 
+    
         <TableBodyRow>
 
               <TableBodyCell>{data.name}</TableBodyCell>
@@ -118,13 +132,16 @@ $: filteredItems = convertedData.filter((item) =>
               <TableBodyCell class="px-3"><Badge status= {data.status_Out || 'nil'}/></TableBodyCell>
               <TableBodyCell class="px-3">{data.time_in}</TableBodyCell>
               <TableBodyCell class="px-3">{data.time_out}</TableBodyCell>
+              <TableBodyCell class="px-3 hidden">{data.date}</TableBodyCell>
               <TableBodyCell class="px-3">{data.work_duration}</TableBodyCell>
               <TableBodyCell class="px-3">
                 <a href="/reports/{data.id}" class="font-medium text-blue-600 hover:underline dark:text-primary-500">VIEW</a>
             </TableBodyCell>
             </TableBodyRow>
             
+         
           {/each} 
+         
       </TableBody>
     </Table>
   </div>
