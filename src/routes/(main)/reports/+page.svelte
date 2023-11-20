@@ -2,15 +2,15 @@
     import type { PageData } from './$types';
   import { SearchOutline } from 'flowbite-svelte-icons';
   import Icon from '@iconify/svelte';
-  import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, Select, TableHeadCell , Button, Dropdown, DropdownItem, Checkbox,Input} from 'flowbite-svelte';
+  import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, Select, TableHeadCell , Button, Dropdown,Radio, DropdownItem, Checkbox,Input} from 'flowbite-svelte';
   import {filterArrayOfObjects, flattenObjects, convertUtcToWat, transformObject, transformArray} from '$lib/repo';
-  import  { LGA } from '$lib/db';
   import Badge from '$lib/components/Badge.svelte';
-
+  let group = 2;
   let selected;
-  let periods = [ ];
+  let periods = [
+    { value: 'All', name: 'All' },
+  ];
   let uniqueValuesSet = new Set();
-  let LGAkeys = Object.keys(LGA);
   export let data: PageData;
 let { reports} = data;
 // console.log(new Date(reports[0].created).toLocaleDateString())
@@ -20,6 +20,12 @@ const cleanedData = flattenObjects(reports);
   // const transformedArray = transformArray(originalArray);
 
 const filterArray =['name', 'location_In','location_Out', 'status_In', 'status_Out','time_in','time_out', 'work_duration', 'id']
+const statuses =[
+  { value: 'All', name: 'All' },
+  { value: 'Present', name: 'Present' },
+  { value: 'Absent', name: 'Absent' },
+  { value: 'Excused', name: 'Excused' },
+]
 const tableData = filterArrayOfObjects(cleanedData,filterArray)
 const tableHeaders = Object.keys(tableData[0])
 
@@ -48,27 +54,17 @@ const convertedData = tableData.map(entry => {
 
 let searchTerm = '';
 let dropTerm = '';
-$: filteredItems = convertedData.filter((item) =>
-    Object.values(item).some((value) =>
-      typeof value === 'string' && value.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
-  $: filteredItems = convertedData.filter((item) =>
-    Object.values(item).some((value) =>
-      typeof value === 'string' && value.toLowerCase().includes(dropTerm.toLowerCase())
-    )
-  );
-// let obj = {
-//   searchTerm: '',
-//   dropTerm: ''
-// };
-// $: searchTerm = obj.searchTerm
-// $: dropTerm = obj.dropTerm
+let stat = '';
 
-
-
-
-
+  $: filteredItems = 
+convertedData.filter((item) =>
+      Object.values(item).some((value) =>
+        (typeof value === 'string') && 
+       value.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      ( stat ==="All" || value.toLowerCase().includes(stat.toLowerCase())) &&
+      (dropTerm ==="All" || value.includes(dropTerm) )
+      )
+    );
 
 </script>
 
@@ -94,15 +90,10 @@ $: filteredItems = convertedData.filter((item) =>
             </Button>
               <Dropdown class="w-full p-3 space-y-3 text-sm">
              
-                {#each LGAkeys as key}
-                <li>
-                  <Checkbox bind:value={searchTerm}> {key}</Checkbox>
-                 
+                {#each statuses as status}
+                <li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+                  <Radio name="group" bind:group={stat} value={status.value}>{status.name}</Radio>
                 </li>
-                <!-- <li>
-                  <Radio name="searchTerm" bind:group={searchTerm} value={1}>{key}</Radio>
-                </li> -->
-              
               {/each}
               </Dropdown>
           </div>
